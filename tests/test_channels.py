@@ -31,7 +31,7 @@ def _delivery_kwargs(**overrides: Any) -> dict[str, Any]:
 
 
 def test_delivery_error_is_a_distinct_exception_type():
-    from tai_contract.channels import ChannelDeliveryError
+    from tai42_contract.channels import ChannelDeliveryError
 
     assert issubclass(ChannelDeliveryError, Exception)
     # A distinct type so the ask helper can catch delivery failure without also
@@ -42,7 +42,7 @@ def test_delivery_error_is_a_distinct_exception_type():
 
 
 def test_channel_protocol_is_runtime_checkable_and_shaped():
-    from tai_contract.channels import Channel, ChannelDelivery, ChannelNotification
+    from tai42_contract.channels import Channel, ChannelDelivery, ChannelNotification
 
     class _Ok:
         async def deliver(self, delivery: ChannelDelivery) -> None:
@@ -65,7 +65,7 @@ def test_channel_protocol_is_runtime_checkable_and_shaped():
 
 
 def test_deliver_is_a_coroutine_signature():
-    from tai_contract.channels import Channel
+    from tai42_contract.channels import Channel
 
     assert inspect.iscoroutinefunction(Channel.deliver)
     sig = inspect.signature(Channel.deliver)
@@ -73,7 +73,7 @@ def test_deliver_is_a_coroutine_signature():
 
 
 def test_notify_is_a_coroutine_signature():
-    from tai_contract.channels import Channel
+    from tai42_contract.channels import Channel
 
     assert inspect.iscoroutinefunction(Channel.notify)
     sig = inspect.signature(Channel.notify)
@@ -81,7 +81,7 @@ def test_notify_is_a_coroutine_signature():
 
 
 def test_notify_protocol_default_raises_not_implemented():
-    from tai_contract.channels import Channel, ChannelDelivery, ChannelNotification
+    from tai42_contract.channels import Channel, ChannelDelivery, ChannelNotification
 
     class _DeliverCapableOnly(Channel):
         """Explicit subclass keeping the inherited ``notify`` default body."""
@@ -99,7 +99,7 @@ def test_notify_protocol_default_raises_not_implemented():
 def test_notification_model_is_frozen():
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelNotification
+    from tai42_contract.channels import ChannelNotification
 
     notification = ChannelNotification(message="deploy finished")
     with pytest.raises(ValidationError):
@@ -110,14 +110,14 @@ def test_notification_model_is_frozen():
 def test_notification_rejects_blank_message(blank: str):
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelNotification
+    from tai42_contract.channels import ChannelNotification
 
     with pytest.raises(ValidationError, match="non-blank"):
         ChannelNotification(message=blank)
 
 
 def test_notification_recipient_defaults_to_none_and_accepts_an_address():
-    from tai_contract.channels import ChannelNotification
+    from tai42_contract.channels import ChannelNotification
 
     assert ChannelNotification(message="hi").recipient is None
     assert ChannelNotification(message="hi", recipient="@ops-team").recipient == "@ops-team"
@@ -127,7 +127,7 @@ def test_notification_recipient_defaults_to_none_and_accepts_an_address():
 def test_notification_recipient_rejects_empty_when_present(empty: str):
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelNotification
+    from tai42_contract.channels import ChannelNotification
 
     with pytest.raises(ValidationError, match="non-empty address"):
         ChannelNotification(message="hi", recipient=empty)
@@ -136,7 +136,7 @@ def test_notification_recipient_rejects_empty_when_present(empty: str):
 def test_delivery_model_is_frozen():
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     delivery = ChannelDelivery(**_delivery_kwargs())
     with pytest.raises(ValidationError):
@@ -146,7 +146,7 @@ def test_delivery_model_is_frozen():
 def test_delivery_select_requires_options():
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     with pytest.raises(ValidationError, match="non-empty options"):
         ChannelDelivery(**_delivery_kwargs(answer_format="select"))
@@ -157,7 +157,7 @@ def test_delivery_select_requires_options():
 def test_delivery_non_select_forbids_options():
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     with pytest.raises(ValidationError, match="carries no options"):
         ChannelDelivery(**_delivery_kwargs(options=["stray"]))
@@ -166,7 +166,7 @@ def test_delivery_non_select_forbids_options():
 def test_delivery_unknown_answer_format_rejected():
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     with pytest.raises(ValidationError, match="answer_format"):
         ChannelDelivery(**_delivery_kwargs(answer_format="carrier-pigeon"))
@@ -175,7 +175,7 @@ def test_delivery_unknown_answer_format_rejected():
 def test_delivery_form_answer_format_rejected():
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     # "form" is a valid AnswerFormat but not channel-deliverable: a multi-field
     # form has no single-reply mapping, so the model itself rejects it.
@@ -184,7 +184,7 @@ def test_delivery_form_answer_format_rejected():
 
 
 def test_delivery_recipient_defaults_to_none_and_accepts_an_address():
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     assert ChannelDelivery(**_delivery_kwargs()).recipient is None
     assert ChannelDelivery(**_delivery_kwargs(recipient="@ops-team")).recipient == "@ops-team"
@@ -194,7 +194,7 @@ def test_delivery_recipient_defaults_to_none_and_accepts_an_address():
 def test_delivery_recipient_rejects_empty_when_present(empty: str):
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     with pytest.raises(ValidationError, match="non-empty address"):
         ChannelDelivery(**_delivery_kwargs(recipient=empty))
@@ -203,14 +203,14 @@ def test_delivery_recipient_rejects_empty_when_present(empty: str):
 def test_delivery_timeout_must_be_tz_aware():
     from pydantic import ValidationError
 
-    from tai_contract.channels import ChannelDelivery
+    from tai42_contract.channels import ChannelDelivery
 
     with pytest.raises(ValidationError, match="timezone-aware"):
         ChannelDelivery(**_delivery_kwargs(timeout_at=datetime(2026, 1, 1)))
 
 
 def test_ask_user_accepts_channel_and_recipient_keywords():
-    from tai_contract.interactions.asker import AskUser
+    from tai42_contract.interactions.asker import AskUser
 
     params = inspect.signature(AskUser.__call__).parameters
     for name in ("channel", "recipient"):

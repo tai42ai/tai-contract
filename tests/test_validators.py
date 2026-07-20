@@ -18,22 +18,22 @@ from typing import Any, cast
 import pytest
 from pydantic import BaseModel
 
-from tai_contract.backend import CallbackSchema
-from tai_contract.connectors.models import (
+from tai42_contract.backend import CallbackSchema
+from tai42_contract.connectors.models import (
     ConnectionRecord,
     ConnectorRef,
     PatchSubServicesRequest,
     StartConnectRequest,
     StartReconnectRequest,
 )
-from tai_contract.connectors.providers import (
+from tai42_contract.connectors.providers import (
     ConfigFieldSpec,
     McpServerDescriptor,
     OAuthEndpoints,
     ProviderDescriptor,
     SubServiceDescriptor,
 )
-from tai_contract.interactions.models import (
+from tai42_contract.interactions.models import (
     MEDIA_CAPTION_MAX_CHARS,
     MEDIA_DATA_URI_MAX_CHARS,
     MEDIA_MAX_ITEMS,
@@ -44,8 +44,8 @@ from tai_contract.interactions.models import (
     MediaItem,
     MediaKind,
 )
-from tai_contract.manifest import AgentsConfig, ApiToolsConfig, Manifest, MCPConfig, TaiMCPConfig, ToolsConfig
-from tai_contract.monitoring.models import MonitoringFilter
+from tai42_contract.manifest import AgentsConfig, ApiToolsConfig, Manifest, MCPConfig, TaiMCPConfig, ToolsConfig
+from tai42_contract.monitoring.models import MonitoringFilter
 
 UUID = "12345678-1234-1234-1234-123456789ABC"
 

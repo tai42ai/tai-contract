@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a defect in tai-contract (pure interface contracts — protocols, ABCs, pydantic models)
+description: Report a defect in tai42-contract (pure interface contracts — protocols, ABCs, pydantic models)
 labels: ["bug"]
 body:
   - type: textarea
@@ -20,7 +20,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: tai-contract version
+      label: tai42-contract version
       placeholder: "0.1.0"
     validations:
       required: true

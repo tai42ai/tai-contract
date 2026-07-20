@@ -12,7 +12,7 @@ import pytest
 
 
 def test_backup_section_info_carries_name_and_secret():
-    from tai_contract.backup import BackupSectionInfo
+    from tai42_contract.backup import BackupSectionInfo
 
     info = BackupSectionInfo(name="connectors", secret=True)
     assert info.name == "connectors"
@@ -20,7 +20,7 @@ def test_backup_section_info_carries_name_and_secret():
 
 
 def test_backup_section_info_is_frozen():
-    from tai_contract.backup import BackupSectionInfo
+    from tai42_contract.backup import BackupSectionInfo
 
     info = BackupSectionInfo(name="settings", secret=False)
     with pytest.raises(pydantic.ValidationError):

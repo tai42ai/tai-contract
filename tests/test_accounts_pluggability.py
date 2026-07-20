@@ -13,19 +13,19 @@ import asyncio
 
 import pytest
 
-from tai_contract.access_control.identity import AuthIdentity
-from tai_contract.access_control.registry import (
+from tai42_contract.access_control.identity import AuthIdentity
+from tai42_contract.access_control.registry import (
     get_identity_provider_factory,
     register_identity_provider,
 )
-from tai_contract.access_control.registry import reset_registry as reset_identity_registry
-from tai_contract.accounts.models import FormField, FormMethod, LoginMethod
-from tai_contract.accounts.provider import (
+from tai42_contract.access_control.registry import reset_registry as reset_identity_registry
+from tai42_contract.accounts.models import FormField, FormMethod, LoginMethod
+from tai42_contract.accounts.provider import (
     AccountsAdminServices,
     AccountsProvider,
     AccountsProviderSettings,
 )
-from tai_contract.accounts.registry import (
+from tai42_contract.accounts.registry import (
     get_accounts_provider_factory,
     iter_accounts_provider_factories,
     register_accounts_provider,

@@ -1394,7 +1394,7 @@ wheels = [
 ]
 
 [[package]]
-name = "tai-contract"
+name = "tai42-contract"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

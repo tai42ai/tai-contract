@@ -19,25 +19,25 @@ from typing import Any
 import pydantic
 import pytest
 
-from tai_contract.agent.base import (
+from tai42_contract.agent.base import (
     Agent,
     AgentInterruptedError,
     PresetSpec,
     SubAgentSpec,
 )
-from tai_contract.agent.events import (
+from tai42_contract.agent.events import (
     InterruptFinal,
     MessageFinal,
     ReasoningStep,
     StreamEvent,
     StructuredFinal,
 )
-from tai_contract.connectors.errors import OperatorMisconfiguredError
-from tai_contract.connectors.models import AuthHealthState, ConnectionRecord, ConnectorRef
-from tai_contract.extensions import ExtensionKind
-from tai_contract.extensions.kinds import ExtensionFactory
-from tai_contract.manifest import Manifest, MCPConfig, TaiMCPConfig
-from tai_contract.storage import assert_not_root
+from tai42_contract.connectors.errors import OperatorMisconfiguredError
+from tai42_contract.connectors.models import AuthHealthState, ConnectionRecord, ConnectorRef
+from tai42_contract.extensions import ExtensionKind
+from tai42_contract.extensions.kinds import ExtensionFactory
+from tai42_contract.manifest import Manifest, MCPConfig, TaiMCPConfig
+from tai42_contract.storage import assert_not_root
 
 UUID = "12345678-1234-1234-1234-123456789abc"
 

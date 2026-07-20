@@ -18,7 +18,7 @@ import pytest
 
 
 def test_document_record_round_trips():
-    from tai_contract.versioning import DocumentRecord
+    from tai42_contract.versioning import DocumentRecord
 
     rec = DocumentRecord(kind="preset", name="summarize", active_version=3, created_at="2026-07-06T00:00:00Z")
     assert rec.is_active is True  # default
@@ -28,7 +28,7 @@ def test_document_record_round_trips():
 
 
 def test_document_version_round_trips_with_tags():
-    from tai_contract.versioning import DocumentVersion
+    from tai42_contract.versioning import DocumentVersion
 
     ver = DocumentVersion(
         version=2,
@@ -44,7 +44,7 @@ def test_document_version_round_trips_with_tags():
 
 
 def test_document_version_tags_default_empty_and_is_current_defaults_false():
-    from tai_contract.versioning import DocumentVersion
+    from tai42_contract.versioning import DocumentVersion
 
     ver = DocumentVersion(version=1, body={}, created_at="2026-07-06T00:00:00Z")
     assert ver.tags == []
@@ -52,7 +52,7 @@ def test_document_version_tags_default_empty_and_is_current_defaults_false():
 
 
 def test_document_version_is_immutable():
-    from tai_contract.versioning import DocumentVersion
+    from tai42_contract.versioning import DocumentVersion
 
     ver = DocumentVersion(version=1, body={}, created_at="2026-07-06T00:00:00Z")
     with pytest.raises(pydantic.ValidationError):
@@ -63,7 +63,7 @@ def test_document_version_is_immutable():
 
 
 def test_versioning_errors_carry_kind_and_name():
-    from tai_contract.versioning import (
+    from tai42_contract.versioning import (
         DocumentExistsError,
         DocumentNotFoundError,
         DocumentStoreError,
@@ -78,7 +78,7 @@ def test_versioning_errors_carry_kind_and_name():
 
 
 def test_document_version_not_found_carries_version():
-    from tai_contract.versioning import DocumentVersionNotFoundError
+    from tai42_contract.versioning import DocumentVersionNotFoundError
 
     err = DocumentVersionNotFoundError("preset", "summarize", 7)
     assert err.version == 7
@@ -91,7 +91,7 @@ def test_document_version_not_found_carries_version():
 
 
 def test_versioned_store_is_runtime_checkable():
-    from tai_contract.versioning import VersionedStore
+    from tai42_contract.versioning import VersionedStore
 
     class Conforms:
         async def create(self, *a: object, **k: object): ...
@@ -117,7 +117,7 @@ def test_versioned_store_is_runtime_checkable():
 
 
 def test_preset_body_round_trips_with_tags():
-    from tai_contract.presets import PresetBody
+    from tai42_contract.presets import PresetBody
 
     body = PresetBody(
         base_tool="web_search",
@@ -136,8 +136,8 @@ def test_preset_body_round_trips_author_bound_config():
     # A preset over an ``ask_external`` tool binds its verifier as author config on
     # the combo element; that ``{"name", "config"}`` mapping must survive a body
     # dump/reload round-trip unchanged (else the bound verifier vanishes on reload).
-    from tai_contract.manifest import ExtensionElement
-    from tai_contract.presets import PresetBody
+    from tai42_contract.manifest import ExtensionElement
+    from tai42_contract.presets import PresetBody
 
     combo: list[ExtensionElement] = [
         {"name": "ask_external", "config": {"verifier": {"name": "github", "config": {"secret_env": "GH"}}}}
@@ -149,7 +149,7 @@ def test_preset_body_round_trips_author_bound_config():
 
 
 def test_preset_body_defaults():
-    from tai_contract.presets import PresetBody
+    from tai42_contract.presets import PresetBody
 
     body = PresetBody(base_tool="web_search")
     assert body.description == ""
@@ -162,7 +162,7 @@ def test_preset_body_defaults():
 
 
 def test_preset_errors_carry_name():
-    from tai_contract.presets import (
+    from tai42_contract.presets import (
         PresetError,
         PresetExistsError,
         PresetNameConflictError,
@@ -184,7 +184,7 @@ def test_preset_errors_carry_name():
 
 
 def test_preset_store_is_runtime_checkable():
-    from tai_contract.presets import PresetStore
+    from tai42_contract.presets import PresetStore
 
     class Conforms:
         async def create_preset(self, *a: object, **k: object): ...
@@ -212,7 +212,7 @@ def test_preset_store_save_version_editable_fields_carry_forward_by_default():
     # output_schema uses the distinct CARRY_FORWARD sentinel (its cleared state is
     # None, so None cannot double as "not provided"). base_tool/description are never
     # arguments — they always carry.
-    from tai_contract.presets import CARRY_FORWARD, PresetStore
+    from tai42_contract.presets import CARRY_FORWARD, PresetStore
 
     sig = inspect.signature(PresetStore.save_version)
     assert list(sig.parameters) == ["self", "name", "fixed_kwargs", "tags", "extensions", "output_schema"]
@@ -225,14 +225,14 @@ def test_preset_store_save_version_editable_fields_carry_forward_by_default():
 
 def test_preset_spec_still_reexported():
     # PresetSpec keeps its single home in agent.base and its re-export here.
-    from tai_contract.agent.base import PresetSpec as SpecHome
-    from tai_contract.presets import PresetSpec
+    from tai42_contract.agent.base import PresetSpec as SpecHome
+    from tai42_contract.presets import PresetSpec
 
     assert PresetSpec is SpecHome
 
 
 def test_old_preset_registry_is_deleted():
-    import tai_contract.presets as presets
+    import tai42_contract.presets as presets
 
     assert not hasattr(presets, "PresetRegistry")
     assert not hasattr(presets, "preset_tool")

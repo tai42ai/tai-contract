@@ -17,9 +17,9 @@ import builtins
 import pydantic
 import pytest
 
-from tai_contract.app import AppStorage
-from tai_contract.manifest import Manifest
-from tai_contract.storage import ObjectStat, Storage
+from tai42_contract.app import AppStorage
+from tai42_contract.manifest import Manifest
+from tai42_contract.storage import ObjectStat, Storage
 
 
 class _MemoryTextStorage(Storage):
@@ -114,8 +114,8 @@ def test_stat_unguessable_path_yields_none():
 
 
 def test_manifest_has_storage_module_field():
-    manifest = Manifest(storage_module="tai_storage_local")
-    assert manifest.storage_module == "tai_storage_local"
+    manifest = Manifest(storage_module="tai42_storage_local")
+    assert manifest.storage_module == "tai42_storage_local"
     assert "storage_module" in Manifest.model_fields
 
 
@@ -123,7 +123,7 @@ def test_manifest_template_module_is_gone():
     # Hard break: the old key no longer exists as a field, and (extra-ignore
     # posture) passing it does NOT populate the new field — no silent alias.
     assert "template_module" not in Manifest.model_fields
-    manifest = Manifest(template_module="tai_storage_local")  # pyright: ignore[reportCallIssue]
+    manifest = Manifest(template_module="tai42_storage_local")  # pyright: ignore[reportCallIssue]
     assert manifest.storage_module is None
     assert "template_module" not in manifest.model_dump()
 

@@ -2,7 +2,7 @@
 private dependency: a public clone runs these green with the `dev` extra.
 
 They prove the contract is internally sound and stable: imports, runtime purity
-(pydantic-only, with the one whitelisted behavioral member ``tai_app``), protocol
+(pydantic-only, with the one whitelisted behavioral member ``tai42_app``), protocol
 shape, the facade partition against the frozen member surface, and the OS-clean
 state (no tenant coupling in connectors, vendor-neutral monitoring, no `Nexus` brand)."""
 
@@ -17,7 +17,7 @@ import pydantic
 import pytest
 from _helpers import protocol_members  # stdlib-only helper, no application package
 
-import tai_contract
+import tai42_contract
 
 # The frozen facade surface: the 56 (sub-protocol, member) pairs over 53
 # distinct flat names, grouped into the 18 sub-protocols. This is the
@@ -103,20 +103,20 @@ EXPECTED_FACADE = {
 
 def _all_contract_models() -> list[type[pydantic.BaseModel]]:
     out: list[type[pydantic.BaseModel]] = []
-    for m in pkgutil.walk_packages(tai_contract.__path__, "tai_contract."):
+    for m in pkgutil.walk_packages(tai42_contract.__path__, "tai42_contract."):
         mod = importlib.import_module(m.name)
         for obj in vars(mod).values():
             if (
                 isinstance(obj, type)
                 and issubclass(obj, pydantic.BaseModel)
-                and obj.__module__.startswith("tai_contract")
+                and obj.__module__.startswith("tai42_contract")
             ):
                 out.append(obj)
     return out
 
 
 def test_every_module_imports():
-    names = [m.name for m in pkgutil.walk_packages(tai_contract.__path__, "tai_contract.")]
+    names = [m.name for m in pkgutil.walk_packages(tai42_contract.__path__, "tai42_contract.")]
     for name in names:
         importlib.import_module(name)
     assert len(names) >= 30
@@ -133,7 +133,7 @@ def test_runtime_purity_models_rebuild():
 
 
 def test_facade_partition_against_frozen_surface():
-    from tai_contract.app import (
+    from tai42_contract.app import (
         AppAdmin,
         AppAgents,
         AppBackends,
@@ -191,7 +191,7 @@ def test_facade_partition_against_frozen_surface():
 
 
 def test_taiapp_exposes_eighteen_namespaces():
-    from tai_contract.app import TaiApp
+    from tai42_contract.app import TaiApp
 
     assert protocol_members(TaiApp) == {
         "tools",
@@ -218,11 +218,11 @@ def test_taiapp_exposes_eighteen_namespaces():
 @pytest.mark.parametrize(
     ("dotted", "expected"),
     [
-        ("tai_contract.extensions.ExtensionKind", {"WRAPPER", "TRANSFORMER", "BACKEND"}),
-        ("tai_contract.connectors.models.AuthHealthState", {"HEALTHY", "RECONNECT_REQUIRED", "REFRESH_FAILING"}),
-        ("tai_contract.monitoring.SpanKind", {"CHAIN", "EVENT", "LLM", "TOOL"}),
-        ("tai_contract.monitoring.MonitoringLevel", {"DEBUG", "DEFAULT", "WARNING", "ERROR"}),
-        ("tai_contract.monitoring.MetricsView", {"OBSERVATIONS", "TRACES"}),
+        ("tai42_contract.extensions.ExtensionKind", {"WRAPPER", "TRANSFORMER", "BACKEND"}),
+        ("tai42_contract.connectors.models.AuthHealthState", {"HEALTHY", "RECONNECT_REQUIRED", "REFRESH_FAILING"}),
+        ("tai42_contract.monitoring.SpanKind", {"CHAIN", "EVENT", "LLM", "TOOL"}),
+        ("tai42_contract.monitoring.MonitoringLevel", {"DEBUG", "DEFAULT", "WARNING", "ERROR"}),
+        ("tai42_contract.monitoring.MetricsView", {"OBSERVATIONS", "TRACES"}),
     ],
 )
 def test_enums_have_expected_members(dotted: str, expected: set[str]):
@@ -234,10 +234,10 @@ def test_enums_have_expected_members(dotted: str, expected: set[str]):
 def test_abc_contracts_are_abstract():
     # The ABC contracts must be genuinely abstract (non-instantiable, with abstract
     # methods), not bare classes.
-    from tai_contract.agent import Agent
-    from tai_contract.backend import Backend
-    from tai_contract.connectors import ConnectorTokenStore
-    from tai_contract.storage import Storage
+    from tai42_contract.agent import Agent
+    from tai42_contract.backend import Backend
+    from tai42_contract.connectors import ConnectorTokenStore
+    from tai42_contract.storage import Storage
 
     for abc_cls in (Agent, Backend, Storage, ConnectorTokenStore):
         assert getattr(abc_cls, "__abstractmethods__", frozenset[str]()), f"{abc_cls.__name__} has no abstract methods"
@@ -256,7 +256,7 @@ def test_backend_surface_is_task_runtime_only():
     # the removed names are absent (guards against re-introduction).
     from collections.abc import Sequence
 
-    from tai_contract.backend import Backend
+    from tai42_contract.backend import Backend
 
     removed = {
         "subscribe_control_plane",
@@ -285,7 +285,7 @@ def test_config_manager_both_transaction_seams_required():
     # satisfies the ABC. ``mutate_manifest`` is a whole-span transaction: a
     # mutator that raises persists nothing; ``replace_manifest`` deletes keys
     # absent from the new document.
-    from tai_contract.config import ConfigManager
+    from tai42_contract.config import ConfigManager
 
     assert {"mutate_manifest", "replace_manifest"} <= ConfigManager.__abstractmethods__
 
@@ -343,7 +343,7 @@ def test_app_lifecycle_accepts_one_arg_fleet_op_handler():
     # AppLifecycle gains ``on_fleet_op_applied`` alongside the zero-arg
     # siblings; its handler takes ONE argument (the op name). A registrar
     # exposing all four members conforms to the runtime-checkable protocol.
-    from tai_contract.app import AppLifecycle
+    from tai42_contract.app import AppLifecycle
 
     assert "on_fleet_op_applied" in protocol_members(AppLifecycle)
     sig = inspect.signature(AppLifecycle.on_fleet_op_applied)
@@ -387,7 +387,7 @@ def test_app_lifecycle_accepts_one_arg_fleet_op_handler():
 
 
 def test_toolinfo_is_a_model_and_constructs():
-    from tai_contract.tools import ToolInfo
+    from tai42_contract.tools import ToolInfo
 
     assert issubclass(ToolInfo, pydantic.BaseModel)
     ti = ToolInfo(name="x")
@@ -396,7 +396,7 @@ def test_toolinfo_is_a_model_and_constructs():
 
 
 def test_runtime_checkable_protocols_accept_and_reject():
-    from tai_contract.transport import Transport
+    from tai42_contract.transport import Transport
 
     class Conforms:
         def connect_session(self, **kw: object): ...
@@ -409,19 +409,19 @@ def test_runtime_checkable_protocols_accept_and_reject():
     assert not isinstance(Missing(), Transport)
 
 
-# -- Purity gate: pydantic-only runtime, tai_app the sole behavioral member -----
+# -- Purity gate: pydantic-only runtime, tai42_app the sole behavioral member -----
 
 
 def test_contract_imports_no_tai_package():
     # The contract must not import any tai-* package at runtime (it is the root of
     # the dependency graph). Scan every module's source for a `tai_` import that is
-    # not `tai_contract` itself.
+    # not `tai42_contract` itself.
     import ast
     from pathlib import Path
 
-    root = next(iter(tai_contract.__path__))
+    root = next(iter(tai42_contract.__path__))
     offenders: list[str] = []
-    for mod in pkgutil.walk_packages(tai_contract.__path__, "tai_contract."):
+    for mod in pkgutil.walk_packages(tai42_contract.__path__, "tai42_contract."):
         spec = importlib.import_module(mod.name).__spec__
         assert spec
         assert spec.origin
@@ -436,7 +436,7 @@ def test_contract_imports_no_tai_package():
             )
             for name in names:
                 top = name.split(".")[0]
-                if top.startswith("tai_") and top != "tai_contract":
+                if top.startswith("tai42_") and top != "tai42_contract":
                     offenders.append(f"{mod.name}: {name}")
     assert not offenders, offenders
     assert root  # sanity
@@ -444,19 +444,19 @@ def test_contract_imports_no_tai_package():
 
 def test_tai_app_is_the_only_behavioral_member():
     # Purity: every contract member is a pydantic model / Protocol / ABC / enum /
-    # plain function-free interface — EXCEPT the whitelisted `tai_app` handle, which
+    # plain function-free interface — EXCEPT the whitelisted `tai42_app` handle, which
     # is the sole object carrying forwarding behavior + mutable state.
-    from tai_contract.app.handle import _TaiAppHandle, tai_app  # pyright: ignore[reportPrivateUsage]
+    from tai42_contract.app.handle import _TaiAppHandle, tai42_app  # pyright: ignore[reportPrivateUsage]
 
-    assert isinstance(tai_app, _TaiAppHandle)
+    assert isinstance(tai42_app, _TaiAppHandle)
     # The handle forwards; it is not a pydantic model / Protocol / ABC.
-    assert not isinstance(tai_app, pydantic.BaseModel)
+    assert not isinstance(tai42_app, pydantic.BaseModel)
 
 
 def test_tai_app_raises_before_bind_and_forwards_after():
     # A fresh handle (not the module singleton) raises loudly on any access before
     # bind, then forwards every attribute to the injected impl after bind.
-    from tai_contract.app.handle import _TaiAppHandle  # pyright: ignore[reportPrivateUsage]
+    from tai42_contract.app.handle import _TaiAppHandle  # pyright: ignore[reportPrivateUsage]
 
     handle = _TaiAppHandle()
     # AttributeError (not RuntimeError) so the attribute protocol stays intact:
@@ -482,7 +482,7 @@ def test_tai_app_raises_before_bind_and_forwards_after():
 
 
 def test_base_client_protocol_runtime_checkable():
-    from tai_contract.clients import BaseClient
+    from tai42_contract.clients import BaseClient
 
     class Pooled:
         def current(self, **kwargs: object): ...
@@ -500,7 +500,7 @@ def test_base_client_protocol_runtime_checkable():
 
 
 def test_connector_token_store_has_no_tenant():
-    from tai_contract.connectors import ConnectorTokenStore
+    from tai42_contract.connectors import ConnectorTokenStore
 
     for name in ("get", "put", "delete"):
         params = inspect.signature(getattr(ConnectorTokenStore, name)).parameters
@@ -511,7 +511,7 @@ def test_connector_token_store_has_no_tenant():
 
 
 def test_connection_record_has_no_tenant_field():
-    from tai_contract.connectors import ConnectionRecord
+    from tai42_contract.connectors import ConnectionRecord
 
     assert "tenant_id" not in ConnectionRecord.model_fields
 
@@ -520,7 +520,7 @@ def test_connector_token_store_put_exposes_compare_and_set():
     # put offers an atomic compare-and-set: a keyword-only `expected_blob` guard,
     # orthogonal to `create_only`, and a bool return (committed vs. CAS-miss) so a
     # caller that loses a cross-replica race learns it lost instead of clobbering.
-    from tai_contract.connectors import ConnectorTokenStore
+    from tai42_contract.connectors import ConnectorTokenStore
 
     sig = inspect.signature(ConnectorTokenStore.put)
     for name in ("create_only", "expected_blob"):
@@ -534,7 +534,7 @@ def test_custom_route_carries_self_describing_metadata():
     # custom_route registers a route AND its OpenAPI metadata: summary + tags +
     # response_model are keyword-only REQUIRED (no default, so a route cannot
     # silently omit them); request_model + authed are keyword-only with defaults.
-    from tai_contract.app import AppHttp
+    from tai42_contract.app import AppHttp
 
     sig = inspect.signature(AppHttp.custom_route)
     for name in ("summary", "tags", "response_model", "request_model", "authed"):
@@ -551,7 +551,7 @@ def test_extension_registration_carries_requires_body_locality():
     # The registration surface stores the body-locality marker the apply site
     # reads to order stacked combos: keyword-only, defaulting to False so an
     # ordinary extension registers unchanged.
-    from tai_contract.app import AppExtensions
+    from tai42_contract.app import AppExtensions
 
     sig = inspect.signature(AppExtensions.extension)
     param = sig.parameters["requires_body_locality"]
@@ -560,7 +560,7 @@ def test_extension_registration_carries_requires_body_locality():
 
 
 def test_set_trace_metadata_has_no_client_name():
-    from tai_contract.monitoring import Span
+    from tai42_contract.monitoring import Span
 
     params = inspect.signature(Span.set_trace_metadata).parameters
     assert "client_name" not in params
@@ -568,11 +568,11 @@ def test_set_trace_metadata_has_no_client_name():
 
 
 def test_taimcpconfig_present_and_no_nexus_brand():
-    from tai_contract.manifest import TaiMCPConfig
+    from tai42_contract.manifest import TaiMCPConfig
 
     assert issubclass(TaiMCPConfig, pydantic.BaseModel)
     # no `Nexus`-branded symbol leaks from the manifest namespace
-    import tai_contract.manifest as manifest
+    import tai42_contract.manifest as manifest
 
     assert not [n for n in dir(manifest) if "Nexus" in n]
 
@@ -582,8 +582,8 @@ def test_monitoring_get_trace_return_is_non_optional():
     # return hint is the bare MonitoringTrace, not MonitoringTrace | None.
     import typing
 
-    from tai_contract.monitoring.models import MonitoringTrace
-    from tai_contract.monitoring.reader import MonitoringReader
+    from tai42_contract.monitoring.models import MonitoringTrace
+    from tai42_contract.monitoring.reader import MonitoringReader
 
     hints = typing.get_type_hints(MonitoringReader.get_trace)
     assert hints["return"] is MonitoringTrace
@@ -595,13 +595,13 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from typing import assert_type
 
-    from tai_contract import tai_app
-    from tai_contract.app import TaiApp
-    from tai_contract.tools import AppTools
+    from tai42_contract import tai42_app
+    from tai42_contract.app import TaiApp
+    from tai42_contract.tools import AppTools
 
     def _typing_probes(app: TaiApp, tools: AppTools, fn: Callable[[int], str]) -> None:  # pyright: ignore[reportUnusedFunction]
-        # Item 7: the exported tai_app carries the protocol types, not Any.
-        assert_type(tai_app.tools, AppTools)
+        # Item 7: the exported tai42_app carries the protocol types, not Any.
+        assert_type(tai42_app.tools, AppTools)
         assert_type(app.tools, AppTools)
         # Item 6: tool/toolkit preserve the decorated callable's type.
         assert_type(tools.tool(fn), Callable[[int], str])

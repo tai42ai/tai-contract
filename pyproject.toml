@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tai-contract"
+name = "tai42-contract"
 version = "0.1.0"
 description = "Pure interface contracts (protocols, ABCs, models) for the TAI ecosystem. No logic; pydantic-only at runtime."
 readme = "README.md"
@@ -52,10 +52,10 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["tai_contract*"]
+include = ["tai42_contract*"]
 
 [tool.setuptools.package-data]
-tai_contract = ["py.typed"]
+tai42_contract = ["py.typed"]
 
 [tool.uv]
 cache-keys = [{ file = "pyproject.toml" }]
@@ -69,15 +69,15 @@ line-length = 120
 select = ["E", "W", "F", "I", "UP", "B", "C4", "SIM", "PIE", "PT", "RUF", "TID"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"tai_kit".msg = "tai-contract is the leaf: it never imports tai-kit."
-"tai_skeleton".msg = "tai-contract is the leaf: it never imports tai-skeleton."
+"tai42_kit".msg = "tai42-contract is the leaf: it never imports tai42-kit."
+"tai42_skeleton".msg = "tai42-contract is the leaf: it never imports tai42-skeleton."
 
 [tool.pytest.ini_options]
 xfail_strict = true
 testpaths = ["tests"]
 
 [tool.coverage.run]
-source = ["tai_contract"]
+source = ["tai42_contract"]
 
 [tool.coverage.report]
 fail_under = 97

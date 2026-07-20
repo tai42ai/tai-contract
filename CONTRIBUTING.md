@@ -1,8 +1,8 @@
-# Contributing to tai-contract
+# Contributing to tai42-contract
 
-`tai-contract` holds **pure interface contracts** — protocols, ABCs, and pydantic
+`tai42-contract` holds **pure interface contracts** — protocols, ABCs, and pydantic
 models. The one rule that shapes everything: **nothing but `pydantic` at runtime,
-and no behaviour beyond a narrow whitelisted surface** — the `tai_app` forwarding
+and no behaviour beyond a narrow whitelisted surface** — the `tai42_app` forwarding
 handle, model-level validators/normalizers, the storage path guard, and `Agent`'s
 default `astream`/terminal-drain; everything else is a pydantic model, Protocol,
 ABC, or enum.
@@ -15,7 +15,7 @@ ABC, or enum.
   annotations`. A vendor type must never be a runtime pydantic model **field**.
 - **No behaviour outside the whitelist.** Protocol methods are `...`; ABC abstract
   methods carry only signatures + docstrings. The only behavioral members are the
-  `tai_app` forwarding handle, model-level validators/normalizers, the storage
+  `tai42_app` forwarding handle, model-level validators/normalizers, the storage
   path guard, and `Agent`'s default `astream`/terminal-drain — anything more
   lives in the impl repos.
 - **Typed package.** `py.typed` ships; keep pyright clean.
@@ -25,7 +25,7 @@ ABC, or enum.
 One subpackage per contract area, each exporting its protocols, ABCs, models,
 and enums:
 
-- `app`, `manifest`, `plugins`, `presets` — the `tai_app` forwarding handle, the
+- `app`, `manifest`, `plugins`, `presets` — the `tai42_app` forwarding handle, the
   manifest/plugin/preset schemas that drive loading.
 - `tools`, `agent`, `extensions`, `hooks`, `sub_mcp`, `template` — the capability
   surfaces a host loads and runs.
@@ -41,7 +41,7 @@ The tests are all self-contained — a public clone runs them green with the `de
 extra. **No private dependency.**
 
 - **`tests/test_contract.py`** — imports, runtime purity (every model rebuilds
-  with vendor libs absent; the purity gate whitelists `tai_app` as the sole
+  with vendor libs absent; the purity gate whitelists `tai42_app` as the sole
   behavioral member), the facade partition against the frozen 53-member surface,
   enums, protocol shape, and the OS-clean state (no tenant coupling in
   connectors, vendor-neutral monitoring, no brand leak).
@@ -70,10 +70,10 @@ The runtime-purity guard — every shipped model must rebuild with only `pydanti
 installed:
 
 ```bash
-uv sync --no-dev && uv run --no-sync python -c "import importlib,pkgutil,pydantic,tai_contract; \
-[o.model_rebuild() for m in pkgutil.walk_packages(tai_contract.__path__,'tai_contract.') \
+uv sync --no-dev && uv run --no-sync python -c "import importlib,pkgutil,pydantic,tai42_contract; \
+[o.model_rebuild() for m in pkgutil.walk_packages(tai42_contract.__path__,'tai42_contract.') \
  for o in vars(importlib.import_module(m.name)).values() \
- if isinstance(o,type) and issubclass(o,pydantic.BaseModel) and o.__module__.startswith('tai_contract')]"
+ if isinstance(o,type) and issubclass(o,pydantic.BaseModel) and o.__module__.startswith('tai42_contract')]"
 uv sync --extra dev
 ```
 

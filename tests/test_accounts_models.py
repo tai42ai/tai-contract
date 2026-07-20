@@ -8,8 +8,8 @@ import inspect
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
-from tai_contract.access_control.identity import ApiKeyIdentityProvider
-from tai_contract.accounts.models import ButtonMethod, FormField, FormMethod, LoginMethod
+from tai42_contract.access_control.identity import ApiKeyIdentityProvider
+from tai42_contract.accounts.models import ButtonMethod, FormField, FormMethod, LoginMethod
 
 _login_method: TypeAdapter[FormMethod | ButtonMethod] = TypeAdapter(LoginMethod)
 
@@ -200,6 +200,6 @@ def test_provision_has_keyword_only_owner_user_id_defaulting_none():
 
 
 def test_owner_user_id_claim_value_and_reexport():
-    from tai_contract.access_control import OWNER_USER_ID_CLAIM
+    from tai42_contract.access_control import OWNER_USER_ID_CLAIM
 
     assert OWNER_USER_ID_CLAIM == "owner_user_id"

@@ -13,7 +13,7 @@ import pytest
 
 
 def test_verification_error_is_a_distinct_exception_type():
-    from tai_contract.webhooks import WebhookVerificationError
+    from tai42_contract.webhooks import WebhookVerificationError
 
     assert issubclass(WebhookVerificationError, Exception)
     # A distinct type so a door can catch verification failure without also
@@ -27,7 +27,7 @@ def test_verifier_protocol_is_runtime_checkable_and_shaped():
     from collections.abc import Mapping
     from typing import Any
 
-    from tai_contract.webhooks import WebhookVerifier
+    from tai42_contract.webhooks import WebhookVerifier
 
     class _Ok:
         async def verify(self, body: bytes, headers: Mapping[str, str], config: dict[str, Any]) -> None:
@@ -41,7 +41,7 @@ def test_verifier_protocol_is_runtime_checkable_and_shaped():
 
 
 def test_verify_is_a_coroutine_signature():
-    from tai_contract.webhooks import WebhookVerifier
+    from tai42_contract.webhooks import WebhookVerifier
 
     sig = inspect.signature(WebhookVerifier.verify)
     assert list(sig.parameters) == ["self", "body", "headers", "config"]

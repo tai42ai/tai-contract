@@ -3,7 +3,7 @@
 Protocol — all new contract surface for pluggable identity providers.
 
 The registry is deliberately app-handle-free: registration works with NO bound
-``tai_app`` (no ``bind()``, no ``start()``), so a plugin registers by direct
+``tai42_app`` (no ``bind()``, no ``start()``), so a plugin registers by direct
 module import in any process.
 """
 
@@ -15,14 +15,14 @@ from typing import Any
 
 import pytest
 
-from tai_contract.access_control.identity import (
+from tai42_contract.access_control.identity import (
     ApiKeyIdentityProvider,
     AuthIdentity,
     IdentityProvider,
     IdentityProviderSettings,
     ReadinessTarget,
 )
-from tai_contract.access_control.registry import (
+from tai42_contract.access_control.registry import (
     get_identity_provider_factory,
     register_identity_provider,
     reset_registry,
@@ -50,7 +50,7 @@ def _fake_factory(*_args: Any, **_kwargs: Any) -> IdentityProvider:
 
 
 def test_register_then_lookup_returns_the_factory():
-    # No bind(), no tai_app anywhere — a plain module-level call.
+    # No bind(), no tai42_app anywhere — a plain module-level call.
     register_identity_provider("fake", _fake_factory)
     assert get_identity_provider_factory("fake") is _fake_factory
     # The factory builds a live provider.
@@ -84,7 +84,7 @@ def test_plugin_shape_registers_at_module_import():
     # at import time. Executing such a module body lands the factory in the
     # registry — no app handle, no bind().
     source = (
-        "from tai_contract.access_control.registry import register_identity_provider\n"
+        "from tai42_contract.access_control.registry import register_identity_provider\n"
         "register_identity_provider('plugin', lambda *a, **k: object())\n"
     )
     module = types.ModuleType("fake_identity_plugin")

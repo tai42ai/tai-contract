@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from tai_contract.hooks import TopicVerifierBinding
+from tai42_contract.hooks import TopicVerifierBinding
 
 
 def test_binding_defaults_config_to_empty_dict():

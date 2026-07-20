@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import asyncio
 
-from tai_contract.access_control.context import (
+from tai42_contract.access_control.context import (
     get_current_user_id,
     reset_request_user_id,
     set_request_user_id,
