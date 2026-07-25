@@ -1,0 +1,19 @@
+name: Feature request
+description: Propose an addition or change to the tai42-contract surface
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should be added or changed, and what problem does it solve? Remember the ground rule — pure contracts only, no logic, nothing but pydantic at runtime.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: tai42-contract version
+      description: The version you are using, if relevant.
+      placeholder: "0.1.0"
+    validations:
+      required: false

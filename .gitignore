@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.DS_Store
+
+.idea/
+
+# local env / secrets
+.env
+.env.*
+
+# coverage / tool caches
+.coverage
+.cache/
+site/
