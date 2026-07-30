@@ -81,10 +81,11 @@ class DeclaredRouteMetadata:
 
 @runtime_checkable
 class AppAgents(Protocol):
-    def agent(self, name: str) -> Callable[[type[_AgentT]], type[_AgentT]]:
+    def agent(self, name: str, tags: set[str] | None = None) -> Callable[[type[_AgentT]], type[_AgentT]]:
         """Register an :class:`Agent` subclass under ``name`` and auto-register
         its JSON ``run`` tool.
 
+        ``tags`` are the run tool's native tags, set on its constructed tool object.
         The decorator returns the class unchanged, so the decorated symbol keeps
         its concrete subclass type."""
         ...

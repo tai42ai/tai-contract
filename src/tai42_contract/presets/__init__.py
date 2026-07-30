@@ -36,7 +36,7 @@ class PresetStore(Protocol):
     Delegation, body validation/reshaping, and error mapping are the concrete
     (skeleton) view's job — this Protocol pins only the surface. A preset body is
     always the full :class:`PresetBody` (``{base_tool, description, fixed_kwargs,
-    extensions, tags}``); the editable-field methods reconstruct it under the
+    extensions}``); the editable-field methods reconstruct it under the
     carry-forward rules documented on :meth:`save_version`.
     """
 
@@ -44,41 +44,45 @@ class PresetStore(Protocol):
         self,
         spec: PresetSpec,
         extensions: Sequence[Sequence[ExtensionElement]],
-        tags: list[str],
         output_schema: dict[str, Any] | None = None,
     ) -> DocumentRecord:
         """Create a versioned preset. ``spec`` carries ``name``/``description``/
-        ``base_tool``/``fixed_kwargs``; ``extensions`` (the combos list), the
-        categorization ``tags``, and the optional ``output_schema`` ride alongside —
-        all of them land in the persisted :class:`PresetBody`. Raise
-        :class:`PresetExistsError` on a duplicate name,
-        :class:`PresetNameConflictError` if the name collides with a base tool."""
+        ``base_tool``/``fixed_kwargs``; ``extensions`` (the combos list) and the
+        optional ``output_schema`` ride alongside — all of them land in the
+        persisted :class:`PresetBody`. Raise :class:`PresetExistsError` on a
+        duplicate name, :class:`PresetNameConflictError` if the name collides with
+        a base tool."""
         ...
 
     async def save_version(
         self,
         name: str,
         fixed_kwargs: dict[str, Any] | None = None,
-        tags: list[str] | None = None,
         extensions: Sequence[Sequence[ExtensionElement]] | None = None,
         output_schema: dict[str, Any] | None | CarryForward = CARRY_FORWARD,
+        description: str | None = None,
     ) -> DocumentVersion:
         """Append a new version from the editable body fields.
 
         A version body is the FULL :class:`PresetBody`, so the view reconstructs
-        the new body by ALWAYS carrying ``base_tool`` and ``description`` forward
-        from the ACTIVE version body, then applying each of ``fixed_kwargs``,
-        ``tags``, ``extensions`` under one UNIFORM sentinel: omitted/``None`` =
-        carry the active value forward unchanged; an explicit empty list (``tags=[]``
-        / ``extensions=[]``) = deliberately CLEAR that field. An explicitly provided
-        empty list is a value, never "not provided". ``output_schema`` follows the
-        SAME rule but with a distinct :data:`CARRY_FORWARD` sentinel (its cleared
-        state is ``None``, so ``None`` cannot double as "not provided"): omitted =
-        carry forward, an explicit ``None`` = clear, an explicit dict = wins. An
-        empty INNER combo (``[[]]`` or any ``[]`` member of ``extensions``) is
-        REJECTED. The new body never DROPS a field. ``tags`` here is the preset-body
-        categorization field, NOT the generic per-version ``DocumentVersion.tags``
-        label. Raise :class:`PresetNotFoundError` if the preset is absent."""
+        the new body by ALWAYS carrying ``base_tool`` forward from the ACTIVE
+        version body, then applying each of ``fixed_kwargs``, ``extensions`` under
+        one UNIFORM sentinel: omitted/``None`` = carry the active value forward
+        unchanged; an explicit empty list (``extensions=[]``) = deliberately CLEAR
+        that field. An explicitly provided empty list is a value, never "not
+        provided". ``output_schema`` follows the SAME rule but with a distinct
+        :data:`CARRY_FORWARD` sentinel (its cleared state is ``None``, so ``None``
+        cannot double as "not provided"): omitted = carry forward, an explicit
+        ``None`` = clear, an explicit dict = wins. ``description`` is editable per
+        version: ``None`` = carry the active description forward, an explicit
+        non-empty string = set it. The RESULTING description — explicit or carried
+        — is validated non-empty (raising :class:`ValueError`, surfaced as a 400),
+        so an explicit ``""`` is rejected and a carry-forward from a legacy body
+        with an empty description raises rather than persisting an empty tool
+        docstring. An empty INNER combo
+        (``[[]]`` or any ``[]`` member of ``extensions``) is REJECTED. The new body
+        never DROPS a field. Raise :class:`PresetNotFoundError` if the preset is
+        absent."""
         ...
 
     async def list_presets(self) -> list[DocumentRecord]:
@@ -107,7 +111,7 @@ class PresetStore(Protocol):
 
     async def get_active_body(self, name: str) -> PresetBody:
         """Return the FULL active-version body (``{base_tool, description,
-        fixed_kwargs, extensions, tags}``) so reload/startup can re-register from
+        fixed_kwargs, extensions}``) so reload/startup can re-register from
         the whole body, not just ``fixed_kwargs``. Raise
         :class:`PresetNotFoundError` if absent."""
         ...
